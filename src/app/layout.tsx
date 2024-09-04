@@ -4,7 +4,7 @@ import { inter } from "~/app/fonts";
 import { GoogleAnalytics } from "@next/third-parties/google";
 import { GeistSans } from "geist/font/sans";
 import { type Metadata } from "next";
-import { Providers } from "./providers";
+import { SessionProvider } from "next-auth/react";
 import { TopNav } from "./_components/topnav";
 import { Footer } from "./_components/footer";
 import { Toaster } from "~/components/ui/toaster";
@@ -20,19 +20,19 @@ export default function RootLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
   return (
-    // <Providers>
-    <html lang="en" className={`${GeistSans.variable}`}>
-      <body className={`${inter.className} antialiased`}>
-        <NextTopLoader />
-        <div className="grid min-h-screen grid-rows-[auto,1fr]">
-          <TopNav />
-          {children}
-          <Toaster />
-          <Footer />
-        </div>
-      </body>
-      {/* <GoogleAnalytics gaId="G-BNX08YMCR9" /> */}
-    </html>
-    // </Providers>
+    <SessionProvider>
+      <html lang="en" className={`${GeistSans.variable}`}>
+        <body className={`${inter.className} antialiased`}>
+          <NextTopLoader />
+          <div className="grid min-h-screen grid-rows-[auto,1fr]">
+            <TopNav />
+            {children}
+            <Toaster />
+            <Footer />
+          </div>
+        </body>
+        {/* <GoogleAnalytics gaId="G-BNX08YMCR9" /> */}
+      </html>
+    </SessionProvider>
   );
 }

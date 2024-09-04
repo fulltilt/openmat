@@ -6,7 +6,7 @@ export default async function SignIn() {
   const isAuthenticated = await checkIsAuthenticated();
 
   if (isAuthenticated) {
-    redirect("/dashboard");
+    redirect("/home");
   }
   return <SignInPage />;
 }
