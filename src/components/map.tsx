@@ -5,26 +5,17 @@ we need to make this component client rendered as well else error occurs
 "use client";
 
 //Map component Component from library
-import { useEffect, useRef, useState } from "react";
-import {
-  Autocomplete,
-  GoogleMap,
-  type Libraries,
-  useLoadScript,
-} from "@react-google-maps/api";
-import {
-  APIProvider,
-  ControlPosition,
-  Map,
-  MapControl,
-} from "@vis.gl/react-google-maps";
-import MapHandler from "./map-handler";
-import { PlaceAutocompleteClassic } from "./placeAutocompleteClassic";
-import { Input } from "./ui/input";
+import { useEffect, useState } from "react";
+import { GoogleMap, Marker } from "@react-google-maps/api";
+
+import { useSession } from "next-auth/react";
+
+import { Button } from "./ui/button";
+import EventForm from "~/app/(ui)/home/form";
 
 //Map's styling
 export const defaultMapContainerStyle = {
-  width: "100%",
+  width: "80vw",
   height: "80vh",
   borderRadius: "15px 0px 0px 15px",
 };
@@ -33,76 +24,122 @@ const defaultMapOptions = {
   zoomControl: true,
   tilt: 0,
   gestureHandling: "auto",
-  // mapTypeId: 'satellite',
 };
 
+const locations = [
+  {
+    lat: 38.0453502,
+    lng: -122.1458514,
+  },
+  {
+    lat: 37.92452400000001,
+    lng: -121.6947009,
+  },
+  {
+    lat: 37.958458,
+    lng: -122.057377,
+  },
+];
+
+function filterLocations(map: google.maps.Map | undefined) {
+  // console.log(locations.filter((l) => map?.getBounds()?.contains(l)));
+}
+
 const MapComponent = () => {
+  const session = useSession();
+
   const [currentLocation, setCurrentLocation] = useState({
     lat: 39,
     lng: -95,
   });
-  // const [selectedPlace, setSelectedPlace] =
-  //   useState<google.maps.places.PlaceResult | null>(null);
   const [zoom, setZoom] = useState(4);
-  const [searchResult, setSearchResult] =
-    useState<google.maps.places.Autocomplete>();
+  const [map, setMap] = useState<google.maps.Map>();
+  const [showForm, setShowForm] = useState(false);
 
-  function onLoad(autocomplete: google.maps.places.Autocomplete) {
-    setSearchResult(autocomplete);
+  useEffect(() => {
+    navigator?.geolocation.getCurrentPosition(
+      ({ coords: { latitude: lat, longitude: lng } }) => {
+        console.log(lat, lng);
+        setCurrentLocation({ lat, lng });
+        setZoom(10);
+      },
+      (error) => console.log(error),
+    );
+
+    getUpcomingEvents();
+  }, [session]);
+
+  async function getUpcomingEvents() {
+    // const evt = {
+    //   timeMax: {
+    //     dateTime: new Date(new Date().getDate() + 7).toISOString(),
+    //     timeZone: Intl.DateTimeFormat().resolvedOptions().timeZone,
+    //   },
+    // };
+
+    if (!session.data) return;
+
+    await fetch(
+      `https://www.googleapis.com/calendar/v3/calendars/${process.env.NEXT_PUBLIC_GOOGLE_CALENDAR_ID}/events?timeMax=${new Date(new Date().getTime() + 7 * (24 * 60 * 60 * 1000)).toISOString()}`,
+      {
+        method: "GET",
+        headers: {
+          Authorization: `Bearer ${session.data?.access_token}`,
+        },
+        // body: JSON.stringify(evt),
+      },
+    )
+      .then((data) => data.json())
+      .then((data) => console.log("data", data))
+      .catch((err) => console.log("error", err));
   }
 
-  // useEffect(() => {
-  //   navigator?.geolocation.getCurrentPosition(
-  //     ({ coords: { latitude: lat, longitude: lng } }) => {
-  //       console.log(lat, lng);
-  //       setCurrentLocation({ lat, lng });
-  //       setZoom(10);
-  //     },
-  //     (error) => console.log(error),
-  //   );
-  // }, []);
-
-  const handleOnPlaceChanged = () => {
-    if (searchResult) {
-      const place = searchResult.getPlace();
-      console.log("Search : ", place);
-    }
-  };
-
   return (
-    // <APIProvider apiKey={process.env.NEXT_PUBLIC_GOOGLE_MAP_API || ""}>
-    //   <div className="w-full">
-    //     <Map
-    //       style={{ width: "100vw", height: "100vh" }}
-    //       defaultCenter={currentLocation}
-    //       defaultZoom={zoom}
-    //       gestureHandling={"greedy"}
-    //       disableDefaultUI={true}
-    //     />
-
-    //     <MapControl position={ControlPosition.TOP}>
-    //       <div className="autocomplete-control">
-    //         <PlaceAutocompleteClassic onPlaceSelect={setSelectedPlace} />
-    //       </div>
-    //     </MapControl>
-
-    //     <MapHandler place={selectedPlace} />
-    //   </div>
-    // </APIProvider>
     <div className="w-full">
-      <Autocomplete
-        onLoad={onLoad}
-        onPlaceChanged={handleOnPlaceChanged}
-        fields={["geometry.location", "formatted_address"]}
-      >
-        <Input placeholder="Enter your address" />
-      </Autocomplete>
-      <GoogleMap
-        mapContainerStyle={defaultMapContainerStyle}
-        center={currentLocation}
-        zoom={zoom}
-        options={defaultMapOptions}
-      ></GoogleMap>
+      <div className="flex">
+        <GoogleMap
+          mapContainerStyle={defaultMapContainerStyle}
+          center={currentLocation}
+          zoom={zoom}
+          options={defaultMapOptions}
+          onLoad={(map) => {
+            setMap(map);
+            filterLocations(map);
+          }}
+          onBoundsChanged={() => filterLocations(map)}
+          onCenterChanged={() => filterLocations(map)}
+          onClick={(e: any) => {
+            if (e.placeId) console.log(e.placeId);
+          }}
+        >
+          {locations.map((l) => (
+            <Marker
+              key={`${l.lat} ${l.lng}`}
+              position={l}
+              onClick={(e) => {
+                const lat = e.latLng?.lat();
+                const lng = e.latLng?.lng();
+              }}
+            />
+          ))}
+        </GoogleMap>
+        <div className="flex flex-col items-center">
+          <Button
+            onClick={() => {
+              setShowForm(true);
+            }}
+          >
+            Add
+          </Button>
+          {showForm && (
+            <EventForm
+              setCurrentLocation={setCurrentLocation}
+              setZoom={setZoom}
+              setShowForm={setShowForm}
+            />
+          )}
+        </div>
+      </div>
     </div>
   );
 };

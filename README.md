@@ -32,3 +32,8 @@ TODO
 [] integrate Google Calendar API
 [] let user create an OpenMat Event with a Location
 [] show locations of OpenMats within the next week
+
+-openmat
+-location: locationId or lat:lng
+-gym name
+-hours

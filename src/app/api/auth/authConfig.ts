@@ -37,6 +37,11 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
       clientId: process.env.AUTH_GOOGLE_ID ?? "",
       clientSecret: process.env.AUTH_GOOGLE_SECRET ?? "",
       allowDangerousEmailAccountLinking: true, // Allow automatic linking of users table to accounts table in database - not dangerous when used with OAuth providers that already perform email verification (like Google)
+      authorization: {
+        params: {
+          scope: "https://www.googleapis.com/auth/calendar openid",
+        },
+      },
     }),
     // Nodemailer({
     //   server: {
@@ -51,7 +56,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
     // }),
   ],
   callbacks: {
-    async jwt({ token, user, session, trigger }) {
+    async jwt({ token, user, session, trigger, account }) {
       if (trigger === "update" && session?.name !== token.name) {
         token.name = session.name;
 
@@ -67,15 +72,17 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
         return {
           ...token,
           id: user.id,
+          access_token: account?.access_token,
         };
       }
       return token;
     },
     async session({ session, token }) {
-      // console.log("session callback", { session, token });
       console.log("session callback");
+      console.log(token);
       return {
         ...session,
+        access_token: token.access_token,
         user: {
           ...session.user,
           id: token.id as string,
