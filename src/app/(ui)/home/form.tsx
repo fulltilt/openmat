@@ -86,7 +86,7 @@ export default function EventForm({
   }
 
   return (
-    <form onSubmit={onSubmit} className="flex flex-col gap-12">
+    <form onSubmit={onSubmit} className="flex flex-col gap-8 text-sm">
       <div>
         <label htmlFor="location">Location</label>
         <Autocomplete

@@ -34,6 +34,8 @@ TODO
 [] show locations of OpenMats within the next week
 
 -openmat
--location: locationId or lat:lng
--gym name
--hours
+-event name: string
+-location: string
+-lat: number
+-lng: number
+-id: 'same as event id from Calendar'

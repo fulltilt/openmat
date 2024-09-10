@@ -55,11 +55,11 @@ const MapComponent = () => {
   const [zoom, setZoom] = useState(4);
   const [map, setMap] = useState<google.maps.Map>();
   const [showForm, setShowForm] = useState(false);
+  const [events, setEvents] = useState([]);
 
   useEffect(() => {
     navigator?.geolocation.getCurrentPosition(
       ({ coords: { latitude: lat, longitude: lng } }) => {
-        console.log(lat, lng);
         setCurrentLocation({ lat, lng });
         setZoom(10);
       },
@@ -70,13 +70,6 @@ const MapComponent = () => {
   }, [session]);
 
   async function getUpcomingEvents() {
-    // const evt = {
-    //   timeMax: {
-    //     dateTime: new Date(new Date().getDate() + 7).toISOString(),
-    //     timeZone: Intl.DateTimeFormat().resolvedOptions().timeZone,
-    //   },
-    // };
-
     if (!session.data) return;
 
     await fetch(
@@ -90,7 +83,10 @@ const MapComponent = () => {
       },
     )
       .then((data) => data.json())
-      .then((data) => console.log("data", data))
+      .then((data) => {
+        console.log("data", data);
+        setEvents(data.items);
+      })
       .catch((err) => console.log("error", err));
   }
 
@@ -123,11 +119,12 @@ const MapComponent = () => {
             />
           ))}
         </GoogleMap>
-        <div className="flex flex-col items-center">
+        <div className="flex w-[20vw] flex-col items-center p-4">
           <Button
             onClick={() => {
               setShowForm(true);
             }}
+            className="mb-4"
           >
             Add
           </Button>
@@ -138,6 +135,8 @@ const MapComponent = () => {
               setShowForm={setShowForm}
             />
           )}
+
+          {events?.map((e) => <div key={e.id}>{e.location}</div>)}
         </div>
       </div>
     </div>

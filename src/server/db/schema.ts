@@ -12,6 +12,7 @@ import {
   text,
   timestamp,
   varchar,
+  decimal,
 } from "drizzle-orm/pg-core";
 
 /**
@@ -101,3 +102,21 @@ export const authenticators = createTable(
     }),
   }),
 );
+
+export const openMat = createTable("open_mat", {
+  id: varchar("id").primaryKey(),
+  name: varchar("name").notNull(),
+  location: varchar("location").notNull(),
+  lat: decimal("lat").notNull(),
+  lng: decimal("lng").notNull(),
+});
+
+export const openMatAdmin = createTable("open_mat_admin", {
+  id: serial("id").primaryKey(),
+  location_id: varchar("location_id")
+    .notNull()
+    .references(() => openMat.id),
+  user_id: varchar("user_id")
+    .notNull()
+    .references(() => user.id),
+});
