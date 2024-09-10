@@ -9,6 +9,7 @@ import { Input } from "~/components/ui/input";
 
 import { Autocomplete } from "@react-google-maps/api";
 import { toLocalISOString } from "~/lib/utils";
+import { addOpenMat } from "~/server/queries";
 
 export default function EventForm({
   setCurrentLocation,
@@ -49,14 +50,14 @@ export default function EventForm({
     event.preventDefault();
 
     const formData = new FormData(event.currentTarget);
+    const name = formData.get("name");
     const location = formData.get("location");
     const recurring = formData.get("recurrence");
-
     const startDate = new Date(formData.get("startDate") as string);
     const endDate = new Date(formData.get("endDate") as string);
 
     const evt = {
-      // title:"",
+      title: name,
       location,
       start: {
         dateTime: startDate.toISOString(),
@@ -80,13 +81,22 @@ export default function EventForm({
       },
     )
       .then((data) => data.json())
-      .then((data) => console.log("data", data))
+      .then((data) => {
+        console.log("data", data);
+
+        addOpenMat(data.id, name, location, data.lat, data.lng);
+      })
       .catch((err) => console.log("error", err))
       .finally(() => setShowForm(false));
   }
 
   return (
     <form onSubmit={onSubmit} className="flex flex-col gap-8 text-sm">
+      <div>
+        <label htmlFor="name">Event Name</label>
+        <Input id="name" name="name" />
+      </div>
+
       <div>
         <label htmlFor="location">Location</label>
         <Autocomplete

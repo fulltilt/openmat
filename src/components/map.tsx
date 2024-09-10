@@ -11,11 +11,14 @@ import { GoogleMap, Marker } from "@react-google-maps/api";
 import { useSession } from "next-auth/react";
 
 import { Button } from "./ui/button";
+import { Calendar } from "./ui/calendar";
+import { Calendar as CalendarIcon } from "lucide-react";
 import EventForm from "~/app/(ui)/home/form";
+import { getOpenMats } from "~/server/queries";
 
 //Map's styling
 export const defaultMapContainerStyle = {
-  width: "80vw",
+  width: "75vw",
   height: "80vh",
   borderRadius: "15px 0px 0px 15px",
 };
@@ -45,6 +48,14 @@ function filterLocations(map: google.maps.Map | undefined) {
   // console.log(locations.filter((l) => map?.getBounds()?.contains(l)));
 }
 
+type Event = {
+  lat: string;
+  lng: string;
+  id: string;
+  name: string;
+  location: string;
+};
+
 const MapComponent = () => {
   const session = useSession();
 
@@ -55,7 +66,8 @@ const MapComponent = () => {
   const [zoom, setZoom] = useState(4);
   const [map, setMap] = useState<google.maps.Map>();
   const [showForm, setShowForm] = useState(false);
-  const [events, setEvents] = useState([]);
+  const [allEvents, setAllEvents] = useState<Event[]>([]);
+  const [date, setDate] = useState(new Date());
 
   useEffect(() => {
     navigator?.geolocation.getCurrentPosition(
@@ -66,14 +78,18 @@ const MapComponent = () => {
       (error) => console.log(error),
     );
 
-    getUpcomingEvents();
+    getUpcomingEvents(new Date());
+
+    getOpenMats()
+      .then((res) => setAllEvents(res))
+      .catch((err) => console.log(err));
   }, [session]);
 
-  async function getUpcomingEvents() {
+  async function getUpcomingEvents(date: Date) {
     if (!session.data) return;
 
     await fetch(
-      `https://www.googleapis.com/calendar/v3/calendars/${process.env.NEXT_PUBLIC_GOOGLE_CALENDAR_ID}/events?timeMax=${new Date(new Date().getTime() + 7 * (24 * 60 * 60 * 1000)).toISOString()}`,
+      `https://www.googleapis.com/calendar/v3/calendars/${process.env.NEXT_PUBLIC_GOOGLE_CALENDAR_ID}/events?timeMax=${new Date(date.getTime() + 7 * (24 * 60 * 60 * 1000)).toISOString()}`,
       {
         method: "GET",
         headers: {
@@ -85,7 +101,7 @@ const MapComponent = () => {
       .then((data) => data.json())
       .then((data) => {
         console.log("data", data);
-        setEvents(data.items);
+        setAllEvents(data.items);
       })
       .catch((err) => console.log("error", err));
   }
@@ -119,15 +135,26 @@ const MapComponent = () => {
             />
           ))}
         </GoogleMap>
-        <div className="flex w-[20vw] flex-col items-center p-4">
-          <Button
-            onClick={() => {
-              setShowForm(true);
-            }}
-            className="mb-4"
-          >
-            Add
-          </Button>
+        <div className="flex w-[25vw] flex-col items-center p-4">
+          <div className="flex">
+            <Button
+              onClick={() => {
+                setShowForm(true);
+              }}
+              className="mb-4"
+            >
+              Add
+            </Button>
+            <Calendar
+              mode="single"
+              selected={date}
+              onSelect={(date) => {
+                setDate(date!);
+                getUpcomingEvents(date!);
+              }}
+              initialFocus
+            />
+          </div>
           {showForm && (
             <EventForm
               setCurrentLocation={setCurrentLocation}
@@ -136,7 +163,7 @@ const MapComponent = () => {
             />
           )}
 
-          {events?.map((e) => <div key={e.id}>{e.location}</div>)}
+          {allEvents?.map((e) => <div key={e.id}>{e.location}</div>)}
         </div>
       </div>
     </div>

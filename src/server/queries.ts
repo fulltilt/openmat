@@ -1,6 +1,6 @@
 import { lt, sql } from "drizzle-orm";
 import { db } from "./db";
-import { verificationTokens } from "./db/schema";
+import { openMat, verificationTokens } from "./db/schema";
 
 export async function clearStaleTokens() {
   try {
@@ -21,4 +21,18 @@ export async function checkForExistingGoogleAccount(uuid: string) {
   } catch (err) {
     throw err;
   }
+}
+
+export async function getOpenMats() {
+  return await db.select().from(openMat).execute();
+}
+
+export async function addOpenMat(
+  id: string,
+  name: string,
+  location: string,
+  lat: number,
+  lng: number,
+) {
+  await db.insert(openMat).values({ id, name, location, lat, lng });
 }
