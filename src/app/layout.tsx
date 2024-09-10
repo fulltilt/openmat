@@ -18,7 +18,8 @@ export const metadata: Metadata = {
 
 export default function RootLayout({
   children,
-}: Readonly<{ children: React.ReactNode }>) {
+  modal,
+}: Readonly<{ children: React.ReactNode; modal: React.ReactNode }>) {
   return (
     <SessionProvider>
       <html lang="en" className={`${GeistSans.variable}`}>
@@ -27,6 +28,8 @@ export default function RootLayout({
           <div className="grid min-h-screen grid-rows-[auto,1fr]">
             <TopNav />
             {children}
+            {modal}
+            <div id="modal-root" />
             <Toaster />
             <Footer />
           </div>

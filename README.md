@@ -29,13 +29,8 @@ You can check out the [create-t3-app GitHub repository](https://github.com/t3-os
 Follow our deployment guides for [Vercel](https://create.t3.gg/en/deployment/vercel), [Netlify](https://create.t3.gg/en/deployment/netlify) and [Docker](https://create.t3.gg/en/deployment/docker) for more information.
 
 TODO
-[] integrate Google Calendar API
+[x] integrate Google Calendar API
 [] let user create an OpenMat Event with a Location
-[] show locations of OpenMats within the next week
+[x] show locations of OpenMats within the next week
 
--openmat
--event name: string
--location: string
--lat: number
--lng: number
--id: 'same as event id from Calendar'
+https://devrecipes.net/modal-component-with-next-js-part-2/

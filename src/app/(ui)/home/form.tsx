@@ -30,6 +30,8 @@ export default function EventForm({
       new Date(new Date(startDate).getTime() + 2 * (60 * 60 * 1000)),
     ),
   );
+  const [lat, setLat] = useState(0);
+  const [lng, setLng] = useState(0);
 
   function onLoad(autocomplete: google.maps.places.Autocomplete) {
     setSearchResult(autocomplete);
@@ -40,6 +42,8 @@ export default function EventForm({
       const place = searchResult.getPlace();
       const lat = place.geometry?.location?.lat() ?? 39;
       const lng = place.geometry?.location?.lng() ?? -95;
+      setLat(lat);
+      setLng(lng);
 
       setCurrentLocation({ lat, lng });
       setZoom(16);
@@ -57,7 +61,7 @@ export default function EventForm({
     const endDate = new Date(formData.get("endDate") as string);
 
     const evt = {
-      title: name,
+      summary: name,
       location,
       start: {
         dateTime: startDate.toISOString(),
@@ -81,10 +85,15 @@ export default function EventForm({
       },
     )
       .then((data) => data.json())
-      .then((data) => {
+      .then(async (data) => {
         console.log("data", data);
 
-        addOpenMat(data.id, name, location, data.lat, data.lng);
+        try {
+          const res = await addOpenMat(data.id, name, location, lat, lng);
+          console.log(res);
+        } catch (err) {
+          console.log(err);
+        }
       })
       .catch((err) => console.log("error", err))
       .finally(() => setShowForm(false));

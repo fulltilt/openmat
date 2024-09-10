@@ -4,7 +4,6 @@ we need to make this component client rendered as well else error occurs
 */
 "use client";
 
-//Map component Component from library
 import { useEffect, useState } from "react";
 import { GoogleMap, Marker } from "@react-google-maps/api";
 import { format } from "date-fns";
@@ -23,6 +22,7 @@ import {
 import EventForm from "~/app/(ui)/home/form";
 import { getOpenMats } from "~/server/queries";
 import { cn } from "~/lib/utils";
+import Modal from "./modal";
 
 //Map's styling
 export const defaultMapContainerStyle = {
@@ -36,21 +36,6 @@ const defaultMapOptions = {
   tilt: 0,
   gestureHandling: "auto",
 };
-
-const locations = [
-  {
-    lat: 38.0453502,
-    lng: -122.1458514,
-  },
-  {
-    lat: 37.92452400000001,
-    lng: -121.6947009,
-  },
-  {
-    lat: 37.958458,
-    lng: -122.057377,
-  },
-];
 
 function filterLocations(map: google.maps.Map | undefined) {
   // console.log(locations.filter((l) => map?.getBounds()?.contains(l)));
@@ -75,11 +60,13 @@ const MapComponent = () => {
   const [map, setMap] = useState<google.maps.Map>();
   const [showForm, setShowForm] = useState(false);
   const [allEvents, setAllEvents] = useState<Event[]>([]);
+  const [upcomingEvents, setUpcomingEvents] = useState<Event[]>([]);
   const [date, setDate] = useState(new Date());
 
   useEffect(() => {
     navigator?.geolocation.getCurrentPosition(
       ({ coords: { latitude: lat, longitude: lng } }) => {
+        console.log(lat, lng);
         setCurrentLocation({ lat, lng });
         setZoom(10);
       },
@@ -103,14 +90,10 @@ const MapComponent = () => {
         headers: {
           Authorization: `Bearer ${session.data?.access_token}`,
         },
-        // body: JSON.stringify(evt),
       },
     )
       .then((data) => data.json())
-      .then((data) => {
-        console.log("data", data);
-        setAllEvents(data.items);
-      })
+      .then((data) => setUpcomingEvents(data.items))
       .catch((err) => console.log("error", err));
   }
 
@@ -132,36 +115,29 @@ const MapComponent = () => {
             if (e.placeId) console.log(e.placeId);
           }}
         >
-          {locations.map((l) => (
+          {allEvents.map((l) => (
+            // <Popover key={`${l.lat} ${l.lng}`}>
+            //   <PopoverTrigger asChild>
             <Marker
               key={`${l.lat} ${l.lng}`}
-              position={l}
+              position={{ lat: parseFloat(l.lat), lng: parseFloat(l.lng) }}
               onClick={(e) => {
                 const lat = e.latLng?.lat();
                 const lng = e.latLng?.lng();
               }}
             />
+            //   </PopoverTrigger>
+            //   <PopoverContent className="w-auto p-0">
+            //     {l.location}
+            //   </PopoverContent>
+            // </Popover>
           ))}
         </GoogleMap>
         <div className="flex w-[25vw] flex-col items-center p-4">
           <div className="flex">
-            <Button
-              onClick={() => {
-                setShowForm(true);
-              }}
-              className="mb-4"
-            >
+            <Button onClick={() => setShowForm(true)} className="mb-4">
               Add
             </Button>
-            {/* <Calendar
-              mode="single"
-              selected={date}
-              onSelect={(date) => {
-                setDate(date!);
-                getUpcomingEvents(date!);
-              }}
-              initialFocus
-            /> */}
             <Popover>
               <PopoverTrigger asChild>
                 <Button
@@ -189,14 +165,16 @@ const MapComponent = () => {
             </Popover>
           </div>
           {showForm && (
-            <EventForm
-              setCurrentLocation={setCurrentLocation}
-              setZoom={setZoom}
-              setShowForm={setShowForm}
-            />
+            <Modal onClose={() => setShowForm(false)} title="Add New Open Mat">
+              <EventForm
+                setCurrentLocation={setCurrentLocation}
+                setZoom={setZoom}
+                setShowForm={setShowForm}
+              />
+            </Modal>
           )}
 
-          {allEvents?.map((e) => <div key={e.id}>{e.location}</div>)}
+          {upcomingEvents?.map((e) => <div key={e.id}>{e.location}</div>)}
         </div>
       </div>
     </div>
