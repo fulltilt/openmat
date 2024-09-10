@@ -7,14 +7,22 @@ we need to make this component client rendered as well else error occurs
 //Map component Component from library
 import { useEffect, useState } from "react";
 import { GoogleMap, Marker } from "@react-google-maps/api";
+import { format } from "date-fns";
 
 import { useSession } from "next-auth/react";
 
 import { Button } from "./ui/button";
 import { Calendar } from "./ui/calendar";
 import { Calendar as CalendarIcon } from "lucide-react";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "~/components/ui/popover";
+
 import EventForm from "~/app/(ui)/home/form";
 import { getOpenMats } from "~/server/queries";
+import { cn } from "~/lib/utils";
 
 //Map's styling
 export const defaultMapContainerStyle = {
@@ -89,7 +97,7 @@ const MapComponent = () => {
     if (!session.data) return;
 
     await fetch(
-      `https://www.googleapis.com/calendar/v3/calendars/${process.env.NEXT_PUBLIC_GOOGLE_CALENDAR_ID}/events?timeMax=${new Date(date.getTime() + 7 * (24 * 60 * 60 * 1000)).toISOString()}`,
+      `https://www.googleapis.com/calendar/v3/calendars/${process.env.NEXT_PUBLIC_GOOGLE_CALENDAR_ID}/events?timeMin=${new Date(date.getTime()).toISOString()}&timeMax=${new Date(date.getTime() + 7 * (24 * 60 * 60 * 1000)).toISOString()}`,
       {
         method: "GET",
         headers: {
@@ -145,7 +153,7 @@ const MapComponent = () => {
             >
               Add
             </Button>
-            <Calendar
+            {/* <Calendar
               mode="single"
               selected={date}
               onSelect={(date) => {
@@ -153,7 +161,32 @@ const MapComponent = () => {
                 getUpcomingEvents(date!);
               }}
               initialFocus
-            />
+            /> */}
+            <Popover>
+              <PopoverTrigger asChild>
+                <Button
+                  variant={"outline"}
+                  className={cn(
+                    "w-[280px] justify-start text-left font-normal",
+                    !date && "text-muted-foreground",
+                  )}
+                >
+                  <CalendarIcon className="mr-2 h-4 w-4" />
+                  {date ? format(date, "PPP") : <span>Pick a date</span>}
+                </Button>
+              </PopoverTrigger>
+              <PopoverContent className="w-auto p-0">
+                <Calendar
+                  mode="single"
+                  selected={date}
+                  onSelect={(date) => {
+                    setDate(date!);
+                    getUpcomingEvents(date!);
+                  }}
+                  initialFocus
+                />
+              </PopoverContent>
+            </Popover>
           </div>
           {showForm && (
             <EventForm

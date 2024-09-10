@@ -64,43 +64,8 @@ export default function SignInPage() {
         className="w-80 rounded-2xl bg-white p-8 text-center"
         style={{ boxShadow: "0 4px 8px hsl(0, 0%, 70%)" }}
       >
-        <h2 className="mb-4 text-3xl">PokeTrades</h2>
         <h2 className="text-2xl">Sign In</h2>
         <div className="mt-4 flex flex-col items-center gap-4">
-          <form
-            className="flex w-[100%] flex-col gap-4"
-            onSubmit={handleSubmit}
-          >
-            <input
-              className="rounded-sm border p-2"
-              style={{ borderColor: "hsl(0, 0%, 70%)" }}
-              type="email"
-              maxLength={320}
-              placeholder="Email Address"
-              onChange={(event: React.ChangeEvent<HTMLInputElement>) =>
-                setFormData({ email: event.target.value })
-              }
-              disabled={isPending}
-              required
-            />
-            <Button type="submit" onClick={() => setLoading1(true)}>
-              {loading1 && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-              &nbsp;&nbsp;Sign in with email
-            </Button>
-          </form>
-
-          <div className="flex w-[75%] items-center p-2">
-            <div
-              className="h-[1px] grow"
-              style={{ backgroundColor: "hsl(0, 0%, 70%)" }}
-            ></div>
-            <span className="p-[0 1rem]">or</span>
-            <div
-              className="h-[1px] grow"
-              style={{ backgroundColor: "hsl(0, 0%, 70%)" }}
-            ></div>
-          </div>
-
           <div className="flex w-[100%] flex-col">
             <Button
               className="google"

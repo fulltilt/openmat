@@ -1,3 +1,5 @@
+"use server";
+
 import { lt, sql } from "drizzle-orm";
 import { db } from "./db";
 import { openMat, verificationTokens } from "./db/schema";
