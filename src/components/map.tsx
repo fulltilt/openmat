@@ -5,7 +5,7 @@ we need to make this component client rendered as well else error occurs
 "use client";
 
 import { useEffect, useState } from "react";
-import { GoogleMap, Marker } from "@react-google-maps/api";
+import { GoogleMap, MarkerF, InfoWindowF } from "@react-google-maps/api";
 import { format } from "date-fns";
 
 import { useSession } from "next-auth/react";
@@ -21,14 +21,16 @@ import {
 
 import EventForm from "~/app/(ui)/home/form";
 import { getOpenMats } from "~/server/queries";
-import { cn } from "~/lib/utils";
+import { cn, timeFormat } from "~/lib/utils";
 import Modal from "./modal";
+import { useRouter } from "next/navigation";
+import type { Event, CalendarEvent } from "../types";
 
 //Map's styling
 export const defaultMapContainerStyle = {
   width: "75vw",
-  height: "80vh",
-  borderRadius: "15px 0px 0px 15px",
+  height: "100vh",
+  // borderRadius: "15px 0px 0px 15px",
 };
 
 const defaultMapOptions = {
@@ -37,20 +39,9 @@ const defaultMapOptions = {
   gestureHandling: "auto",
 };
 
-function filterLocations(map: google.maps.Map | undefined) {
-  // console.log(locations.filter((l) => map?.getBounds()?.contains(l)));
-}
-
-type Event = {
-  lat: string;
-  lng: string;
-  id: string;
-  name: string;
-  location: string;
-};
-
 const MapComponent = () => {
   const session = useSession();
+  const router = useRouter();
 
   const [currentLocation, setCurrentLocation] = useState({
     lat: 39,
@@ -59,9 +50,15 @@ const MapComponent = () => {
   const [zoom, setZoom] = useState(4);
   const [map, setMap] = useState<google.maps.Map>();
   const [showForm, setShowForm] = useState(false);
-  const [allEvents, setAllEvents] = useState<Event[]>([]);
-  const [upcomingEvents, setUpcomingEvents] = useState<Event[]>([]);
+  const [allOpenMats, setAllOpenMats] = useState<Event[]>([]);
+  const [currentEvent, setCurrentEvent] = useState<CalendarEvent & Event>();
+  const [calendarEvents, setCalendarEvents] = useState<CalendarEvent[]>([]);
+  // const [filteredCalendarEvents, setFilteredCalendarEvents] = useState<Event[]>(
+  //   [],
+  // );
   const [date, setDate] = useState(new Date());
+  const [openPopover, setOpenPopover] = useState(false);
+  const [popoverIndex, setPopoverIndex] = useState<number>();
 
   useEffect(() => {
     navigator?.geolocation.getCurrentPosition(
@@ -73,18 +70,33 @@ const MapComponent = () => {
       (error) => console.log(error),
     );
 
-    getUpcomingEvents(new Date());
+    // getUpcomingEvents(new Date());
 
     getOpenMats()
-      .then((res) => setAllEvents(res))
+      .then((res) => setAllOpenMats(res))
       .catch((err) => console.log(err));
-  }, [session]);
+  }, []);
+
+  useEffect(() => {
+    if (!session.data && session.status !== "loading") router.push("/");
+
+    getUpcomingEvents(date);
+    setAllOpenMats(allOpenMats.slice());
+    // .then((res) => {
+    //   console.log(res);
+    //   console.log("useEffect", res);
+    //   setCalendarEvents(res);
+    // });
+  }, [session, date]);
 
   async function getUpcomingEvents(date: Date) {
-    if (!session.data) return;
+    if (!session.data && session.status !== "loading") {
+      router.push("/");
+      return;
+    }
 
-    await fetch(
-      `https://www.googleapis.com/calendar/v3/calendars/${process.env.NEXT_PUBLIC_GOOGLE_CALENDAR_ID}/events?timeMin=${new Date(date.getTime()).toISOString()}&timeMax=${new Date(date.getTime() + 7 * (24 * 60 * 60 * 1000)).toISOString()}`,
+    return await fetch(
+      `https://www.googleapis.com/calendar/v3/calendars/${process.env.NEXT_PUBLIC_GOOGLE_CALENDAR_ID}/events${date ? `?timeMin=${new Date(date.getTime()).toISOString()}&timeMax=${new Date(date.getTime() + 7 * (24 * 60 * 60 * 1000)).toISOString()}&singleEvents=true` : ""}`,
       {
         method: "GET",
         headers: {
@@ -93,8 +105,41 @@ const MapComponent = () => {
       },
     )
       .then((data) => data.json())
-      .then((data) => setUpcomingEvents(data.items))
-      .catch((err) => console.log("error", err));
+      .then((data) => {
+        const calendarEvents = data.items;
+        console.log(date, data.items);
+        setCalendarEvents(calendarEvents);
+        // filterLocations(map, calendarEvents);
+
+        return data.items;
+      })
+      .catch((err) => {
+        console.log("error", err);
+        return err;
+      });
+  }
+  // console.log(filteredCalendarEvents);
+  function filterLocations(
+    map: google.maps.Map | undefined,
+    events: CalendarEvent[] = [],
+  ) {
+    console.log(calendarEvents, allOpenMats);
+    // const locations = events
+    //   ? events.map((e) => e.location)
+    //   : calendarEvents.map((e) => e.location);
+    // const filteredEvents = allOpenMats
+    //   .filter((l) =>
+    //     map
+    //       ?.getBounds()
+    //       ?.contains({ lat: parseFloat(l.lat), lng: parseFloat(l.lng) }),
+    //   )
+    //   .filter((evt) => locations.includes(evt.location));
+    // setFilteredCalendarEvents(filteredEvents);
+  }
+
+  function isThereAnOpenMatThisWeek(openMat: Event) {
+    const locations = calendarEvents.map((evt) => evt.location);
+    return locations.includes(openMat.location);
   }
 
   return (
@@ -107,7 +152,7 @@ const MapComponent = () => {
           options={defaultMapOptions}
           onLoad={(map) => {
             setMap(map);
-            filterLocations(map);
+            getUpcomingEvents(new Date());
           }}
           onBoundsChanged={() => filterLocations(map)}
           onCenterChanged={() => filterLocations(map)}
@@ -115,29 +160,65 @@ const MapComponent = () => {
             if (e.placeId) console.log(e.placeId);
           }}
         >
-          {allEvents.map((l) => (
-            // <Popover key={`${l.lat} ${l.lng}`}>
-            //   <PopoverTrigger asChild>
-            <Marker
-              key={`${l.lat} ${l.lng}`}
-              position={{ lat: parseFloat(l.lat), lng: parseFloat(l.lng) }}
-              onClick={(e) => {
-                const lat = e.latLng?.lat();
-                const lng = e.latLng?.lng();
+          {allOpenMats.map((openMat, i) => (
+            <MarkerF
+              key={`${openMat.lat} ${openMat.lng}`}
+              position={{
+                lat: parseFloat(openMat.lat),
+                lng: parseFloat(openMat.lng),
               }}
-            />
-            //   </PopoverTrigger>
-            //   <PopoverContent className="w-auto p-0">
-            //     {l.location}
-            //   </PopoverContent>
-            // </Popover>
+              onClick={() => {
+                setPopoverIndex(i);
+
+                const calendarEvent = calendarEvents.filter(
+                  (evt) => evt.location === openMat.location,
+                )[0];
+                setCurrentEvent(Object.assign({}, openMat, calendarEvent));
+
+                setOpenPopover(true);
+              }}
+            >
+              {openPopover && i === popoverIndex && (
+                <InfoWindowF
+                  position={{
+                    lat: parseFloat(openMat.lat),
+                    lng: parseFloat(openMat.lng),
+                  }}
+                  onCloseClick={() => setOpenPopover(false)}
+                >
+                  {isThereAnOpenMatThisWeek(openMat) && currentEvent ? (
+                    <div className="flex flex-col gap-2">
+                      <strong>{currentEvent?.location.split(",")[0]}</strong>
+                      <p>
+                        {new Date(
+                          currentEvent!.start?.dateTime,
+                        ).toLocaleDateString()}
+                      </p>
+                      <p>
+                        Start:{" "}
+                        {` ${timeFormat(new Date(currentEvent!.start?.dateTime).toLocaleTimeString())}`}
+                      </p>
+                      <p>
+                        End:{" "}
+                        {`${timeFormat(new Date(currentEvent!.end?.dateTime).toLocaleTimeString())}`}
+                      </p>
+                    </div>
+                  ) : (
+                    <div>
+                      <p>No Open Mat scheduled</p>
+                    </div>
+                  )}
+                </InfoWindowF>
+              )}
+            </MarkerF>
           ))}
         </GoogleMap>
         <div className="flex w-[25vw] flex-col items-center p-4">
-          <div className="flex">
-            <Button onClick={() => setShowForm(true)} className="mb-4">
-              Add
-            </Button>
+          <Button onClick={() => setShowForm(true)} className="mb-4">
+            Add Open Mat
+          </Button>
+          <div>
+            <label htmlFor="week">Week of:</label>
             <Popover>
               <PopoverTrigger asChild>
                 <Button
@@ -153,17 +234,21 @@ const MapComponent = () => {
               </PopoverTrigger>
               <PopoverContent className="w-auto p-0">
                 <Calendar
+                  id="week"
                   mode="single"
                   selected={date}
                   onSelect={(date) => {
+                    console.log(date);
                     setDate(date!);
                     getUpcomingEvents(date!);
                   }}
+                  disabled={{ dayOfWeek: [1, 2, 3, 4, 5, 6] }}
                   initialFocus
                 />
               </PopoverContent>
             </Popover>
           </div>
+
           {showForm && (
             <Modal onClose={() => setShowForm(false)} title="Add New Open Mat">
               <EventForm
@@ -174,7 +259,7 @@ const MapComponent = () => {
             </Modal>
           )}
 
-          {upcomingEvents?.map((e) => <div key={e.id}>{e.location}</div>)}
+          {calendarEvents?.map((e) => <div key={e.id}>{e.location}</div>)}
         </div>
       </div>
     </div>

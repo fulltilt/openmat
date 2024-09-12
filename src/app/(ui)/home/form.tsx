@@ -54,8 +54,8 @@ export default function EventForm({
     event.preventDefault();
 
     const formData = new FormData(event.currentTarget);
-    const name = formData.get("name");
-    const location = formData.get("location");
+    const name = formData.get("name") as string;
+    const location = formData.get("location") as string;
     const recurring = formData.get("recurrence");
     const startDate = new Date(formData.get("startDate") as string);
     const endDate = new Date(formData.get("endDate") as string);

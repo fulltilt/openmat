@@ -30,7 +30,10 @@ Follow our deployment guides for [Vercel](https://create.t3.gg/en/deployment/ver
 
 TODO
 [x] integrate Google Calendar API
-[] let user create an OpenMat Event with a Location
+[x] let user create an OpenMat Event with a Location
 [x] show locations of OpenMats within the next week
+[] let user edit Open Mat once they're verified
+[] Send email when a new open mat is created
+[] Setup Google Analytics
 
 https://devrecipes.net/modal-component-with-next-js-part-2/

@@ -13,3 +13,8 @@ export function toLocalISOString(date) {
   localDate.setMilliseconds(0);
   return localDate.toISOString().slice(0, -1);
 }
+
+export function timeFormat(time: string) {
+  const arr = time.split(":");
+  return `${arr[0]}:${arr[1]} ${arr[2]?.split(" ")[1]}`;
+}
