@@ -53,9 +53,9 @@ const MapComponent = () => {
   const [allOpenMats, setAllOpenMats] = useState<Event[]>([]);
   const [currentEvent, setCurrentEvent] = useState<CalendarEvent & Event>();
   const [calendarEvents, setCalendarEvents] = useState<CalendarEvent[]>([]);
-  // const [filteredCalendarEvents, setFilteredCalendarEvents] = useState<Event[]>(
-  //   [],
-  // );
+  const [filteredCalendarEvents, setFilteredCalendarEvents] = useState<Event[]>(
+    [],
+  );
   const [date, setDate] = useState(new Date());
   const [openPopover, setOpenPopover] = useState(false);
   const [popoverIndex, setPopoverIndex] = useState<number>();
@@ -70,8 +70,6 @@ const MapComponent = () => {
       (error) => console.log(error),
     );
 
-    // getUpcomingEvents(new Date());
-
     getOpenMats()
       .then((res) => setAllOpenMats(res))
       .catch((err) => console.log(err));
@@ -80,13 +78,10 @@ const MapComponent = () => {
   useEffect(() => {
     if (!session.data && session.status !== "loading") router.push("/");
 
-    getUpcomingEvents(date);
-    setAllOpenMats(allOpenMats.slice());
-    // .then((res) => {
-    //   console.log(res);
-    //   console.log("useEffect", res);
-    //   setCalendarEvents(res);
-    // });
+    getUpcomingEvents(date).then((res) => {
+      console.log(res, calendarEvents);
+      filterLocations();
+    });
   }, [session, date]);
 
   async function getUpcomingEvents(date: Date) {
@@ -107,10 +102,8 @@ const MapComponent = () => {
       .then((data) => data.json())
       .then((data) => {
         const calendarEvents = data.items;
-        console.log(date, data.items);
         setCalendarEvents(calendarEvents);
-        // filterLocations(map, calendarEvents);
-
+        filterLocations();
         return data.items;
       })
       .catch((err) => {
@@ -118,23 +111,24 @@ const MapComponent = () => {
         return err;
       });
   }
-  // console.log(filteredCalendarEvents);
-  function filterLocations(
-    map: google.maps.Map | undefined,
-    events: CalendarEvent[] = [],
-  ) {
-    console.log(calendarEvents, allOpenMats);
-    // const locations = events
-    //   ? events.map((e) => e.location)
-    //   : calendarEvents.map((e) => e.location);
-    // const filteredEvents = allOpenMats
-    //   .filter((l) =>
-    //     map
-    //       ?.getBounds()
-    //       ?.contains({ lat: parseFloat(l.lat), lng: parseFloat(l.lng) }),
-    //   )
-    //   .filter((evt) => locations.includes(evt.location));
-    // setFilteredCalendarEvents(filteredEvents);
+
+  function filterLocations() {
+    const locations = calendarEvents?.map((e) => e.location) ?? [];
+    let filteredEvents = allOpenMats
+      .filter((l) =>
+        map
+          ?.getBounds()
+          ?.contains({ lat: parseFloat(l.lat), lng: parseFloat(l.lng) }),
+      )
+      .filter((evt) => locations.includes(evt.location));
+    filteredEvents = filteredEvents.map((evt) =>
+      Object.assign(
+        {},
+        evt,
+        calendarEvents.filter((cal) => evt.location === cal.location),
+      ),
+    );
+    setFilteredCalendarEvents(filteredEvents);
   }
 
   function isThereAnOpenMatThisWeek(openMat: Event) {
@@ -154,8 +148,8 @@ const MapComponent = () => {
             setMap(map);
             getUpcomingEvents(new Date());
           }}
-          onBoundsChanged={() => filterLocations(map)}
-          onCenterChanged={() => filterLocations(map)}
+          onBoundsChanged={() => filterLocations()}
+          onCenterChanged={() => filterLocations()}
           onClick={(e: any) => {
             if (e.placeId) console.log(e.placeId);
           }}
@@ -238,9 +232,9 @@ const MapComponent = () => {
                   mode="single"
                   selected={date}
                   onSelect={(date) => {
-                    console.log(date);
                     setDate(date!);
-                    getUpcomingEvents(date!);
+                    // getUpcomingEvents(date!);
+                    setOpenPopover(false);
                   }}
                   disabled={{ dayOfWeek: [1, 2, 3, 4, 5, 6] }}
                   initialFocus
@@ -259,7 +253,20 @@ const MapComponent = () => {
             </Modal>
           )}
 
-          {calendarEvents?.map((e) => <div key={e.id}>{e.location}</div>)}
+          {filteredCalendarEvents.map((e) => (
+            <div
+              key={e.id}
+              onClick={() =>
+                setCurrentLocation({
+                  lat: parseFloat(e.lat ?? 39),
+                  lng: parseFloat(e.lng ?? -95),
+                })
+              }
+              className="cursor-pointer"
+            >
+              {e.location.split(",")[0]}
+            </div>
+          ))}
         </div>
       </div>
     </div>
