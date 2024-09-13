@@ -38,4 +38,6 @@ export type CalendarEvent = {
     useDefault: boolean;
   };
   eventType: "default" | "outOfOffice" | "focus" | "workingElsewhere"; // Update as per the possible event types
+  lat: string;
+  lng: string;
 };

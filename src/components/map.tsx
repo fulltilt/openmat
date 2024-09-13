@@ -26,7 +26,7 @@ import Modal from "./modal";
 import { useRouter } from "next/navigation";
 import type { Event, CalendarEvent } from "../types";
 
-//Map's styling
+// Map's styling
 export const defaultMapContainerStyle = {
   width: "75vw",
   height: "100vh",
@@ -42,7 +42,7 @@ const defaultMapOptions = {
 const MapComponent = () => {
   const session = useSession();
   const router = useRouter();
-
+  console.log(session);
   const [currentLocation, setCurrentLocation] = useState({
     lat: 39,
     lng: -95,
@@ -53,9 +53,9 @@ const MapComponent = () => {
   const [allOpenMats, setAllOpenMats] = useState<Event[]>([]);
   const [currentEvent, setCurrentEvent] = useState<CalendarEvent & Event>();
   const [calendarEvents, setCalendarEvents] = useState<CalendarEvent[]>([]);
-  const [filteredCalendarEvents, setFilteredCalendarEvents] = useState<Event[]>(
-    [],
-  );
+  const [filteredCalendarEvents, setFilteredCalendarEvents] = useState<
+    (Event | (Event & CalendarEvent))[]
+  >([]);
   const [date, setDate] = useState(new Date());
   const [openPopover, setOpenPopover] = useState(false);
   const [popoverIndex, setPopoverIndex] = useState<number>();
@@ -78,10 +78,7 @@ const MapComponent = () => {
   useEffect(() => {
     if (!session.data && session.status !== "loading") router.push("/");
 
-    getUpcomingEvents(date).then((res) => {
-      console.log(res, calendarEvents);
-      filterLocations();
-    });
+    getUpcomingEvents(date);
   }, [session, date]);
 
   async function getUpcomingEvents(date: Date) {
@@ -101,9 +98,8 @@ const MapComponent = () => {
     )
       .then((data) => data.json())
       .then((data) => {
-        const calendarEvents = data.items;
-        setCalendarEvents(calendarEvents);
-        filterLocations();
+        setCalendarEvents(data.items);
+        filterLocations(data.items);
         return data.items;
       })
       .catch((err) => {
@@ -112,8 +108,10 @@ const MapComponent = () => {
       });
   }
 
-  function filterLocations() {
-    const locations = calendarEvents?.map((e) => e.location) ?? [];
+  function filterLocations(eventDates: Event[] = []) {
+    const locations = (eventDates.length ? eventDates : calendarEvents)?.map(
+      (e) => e.location,
+    );
     let filteredEvents = allOpenMats
       .filter((l) =>
         map
@@ -121,21 +119,25 @@ const MapComponent = () => {
           ?.contains({ lat: parseFloat(l.lat), lng: parseFloat(l.lng) }),
       )
       .filter((evt) => locations.includes(evt.location));
-    filteredEvents = filteredEvents.map((evt) =>
+
+    const combinedEventData = filteredEvents.map((evt) =>
       Object.assign(
         {},
         evt,
-        calendarEvents.filter((cal) => evt.location === cal.location),
+        (eventDates.length ? eventDates : calendarEvents).filter(
+          (cal) => evt.location === cal.location,
+        )[0],
       ),
     );
-    setFilteredCalendarEvents(filteredEvents);
+
+    setFilteredCalendarEvents(combinedEventData);
   }
 
   function isThereAnOpenMatThisWeek(openMat: Event) {
     const locations = calendarEvents.map((evt) => evt.location);
     return locations.includes(openMat.location);
   }
-
+  // console.log(filteredCalendarEvents);
   return (
     <div className="w-full">
       <div className="flex">
@@ -190,12 +192,14 @@ const MapComponent = () => {
                       </p>
                       <p>
                         Start:{" "}
-                        {` ${timeFormat(new Date(currentEvent!.start?.dateTime).toLocaleTimeString())}`}
+                        {`${timeFormat(new Date(currentEvent!.start?.dateTime).toLocaleTimeString())}`}
                       </p>
                       <p>
                         End:{" "}
                         {`${timeFormat(new Date(currentEvent!.end?.dateTime).toLocaleTimeString())}`}
                       </p>
+                      {(session?.data?.user?.email ?? "") ===
+                        currentEvent.creator.email && <Button>Edit</Button>}
                     </div>
                   ) : (
                     <div>
@@ -207,7 +211,7 @@ const MapComponent = () => {
             </MarkerF>
           ))}
         </GoogleMap>
-        <div className="flex w-[25vw] flex-col items-center p-4">
+        <div className="flex w-[25vw] flex-col gap-4 p-4">
           <Button onClick={() => setShowForm(true)} className="mb-4">
             Add Open Mat
           </Button>
@@ -253,20 +257,24 @@ const MapComponent = () => {
             </Modal>
           )}
 
-          {filteredCalendarEvents.map((e) => (
-            <div
-              key={e.id}
-              onClick={() =>
-                setCurrentLocation({
-                  lat: parseFloat(e.lat ?? 39),
-                  lng: parseFloat(e.lng ?? -95),
-                })
-              }
-              className="cursor-pointer"
-            >
-              {e.location.split(",")[0]}
-            </div>
-          ))}
+          <div className="flex flex-col gap-4">
+            {filteredCalendarEvents.map((e) => (
+              <div
+                key={e.id}
+                onClick={() =>
+                  setCurrentLocation({
+                    lat: parseFloat(e.lat ?? 39),
+                    lng: parseFloat(e.lng ?? -95),
+                  })
+                }
+                className="cursor-pointer"
+              >
+                <p>{new Date(e.start?.dateTime).toLocaleDateString()}</p>
+                <p className="font-semibold">{e.location.split(",")[0]}</p>
+                <p>{`${timeFormat(new Date(e.start?.dateTime).toLocaleTimeString())} - ${timeFormat(new Date(e.end?.dateTime).toLocaleTimeString())}`}</p>
+              </div>
+            ))}
+          </div>
         </div>
       </div>
     </div>

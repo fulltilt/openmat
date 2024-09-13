@@ -37,3 +37,4 @@ TODO
 [] Setup Google Analytics
 
 https://devrecipes.net/modal-component-with-next-js-part-2/
+https://web.archive.org/web/20230701010714mp_/https://react-google-maps-api-docs.netlify.app/
