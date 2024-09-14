@@ -9,7 +9,7 @@ export default function About() {
         use, and/or share ("process" your personal information when you use our
         services ("Services"), including when you:
       </p>
-      <ul className="m-auto list-disc">
+      <ul className="ml-12 list-disc space-y-2">
         <li>
           Visit our website at https://openmat-lilac.vercel.app, or any website
           of ours that links to this Privacy Notice
@@ -82,8 +82,11 @@ export default function About() {
           Information?
         </b>
         We may share information in specific situations and with specific third
-        parties. Learn more about when and with whom we share your personal
-        information.
+        parties. Learn more about when and{" "}
+        <a href="#share" className="text-blue-700">
+          with whom we share your personal information
+        </a>
+        .
       </p>
       <p>
         <b>What are your rights?</b> Depending on where you are located
@@ -101,7 +104,7 @@ export default function About() {
         applicable data protection laws.
       </p>
       <p>
-        Want to learn more about what we do with any information we collect?
+        Want to learn more about what we do with any information we collect?{" "}
         <a href="#collect" className="text-blue-700">
           Review the Privacy Notice in full
         </a>
@@ -206,7 +209,7 @@ export default function About() {
         the Services, the choices you make, and the products and features you
         use. The personal information we collect may include the following:
       </p>
-      <ul className="list-disc">
+      <ul className="ml-12 list-disc space-y-2">
         <li>email addresses</li>
       </ul>
 
@@ -253,7 +256,7 @@ export default function About() {
         similar technologies.
       </p>
       <p>The information we collect includes:</p>
-      <ul className="list-disc">
+      <ul className="ml-12 list-disc space-y-2">
         <li>
           <em>Log and Usage Data</em>. Log and usage data is service-related,
           diagnostic, usage, and performance information our servers
@@ -274,8 +277,10 @@ export default function About() {
           target="_blank"
           href="https://developers.google.com/terms/api-services-user-data-policy"
           className="text-blue-700"
-        ></a>
-        Google API Services User Data Policy, including the{" "}
+        >
+          Google API Services User Data Policy
+        </a>
+        , including the{" "}
         <a
           href="https://developers.google.com/terms/api-services-user-data-policy#limited-use"
           target="_blank"
@@ -301,7 +306,7 @@ export default function About() {
         We process your personal information for a varlety of reasons, depending
         on how you interact with our Services, including:
       </p>
-      <ul className="list-disc">
+      <ul className="ml-12 list-disc space-y-2">
         <li>
           <b>
             To facilitate account creation and authentication and otherwise
@@ -345,7 +350,7 @@ export default function About() {
         personal information. As such, we may rely on the following legal bases
         to process your personal information:
       </p>
-      <ul className="list-disc">
+      <ul className="ml-12 list-disc space-y-2">
         <li>
           Consent. We may process your information if you have given us
           permission (i.e., consent) to use your personal information for a
@@ -392,7 +397,7 @@ export default function About() {
         example:
       </p>
 
-      <ul className="list-disc">
+      <ul className="ml-12 list-disc space-y-2">
         <li>
           If collection is clearly in the interests of an individual and consent
           cannot be obtained in a timely way
@@ -450,7 +455,7 @@ export default function About() {
         We may need to share your personal information in the following
         situations:
       </p>
-      <ul className="list-disc">
+      <ul className="ml-12 list-disc space-y-2">
         <li>
           <b>Business Transfers</b>. We may share or transfer your information
           in connection with, or during negotiations of, any merger, sale of
@@ -603,7 +608,7 @@ export default function About() {
         collected, we will deactivate the account and take reasonable measures
         to promptly delete such data from our records. If you become aware of
         any data we may have collected from children under age 18, please
-        contact us at
+        contact us at{" "}
         <a href="mailto:support@openmat.cc" className="text-blue-700">
           support@openmat.cc
         </a>
@@ -698,7 +703,7 @@ export default function About() {
         If you would at any time like to review or change the information in
         your account or terminate your account, you can:
       </p>
-      <ul className="list-disc">
+      <ul className="ml-12 list-disc space-y-2">
         <li>Log in to your account settings and update your user account.</li>
       </ul>
       <p>
@@ -863,7 +868,7 @@ export default function About() {
         categories through instances where you interact with us in person,
         online, or by phone or mail in the context of:
       </p>
-      <ul className="list-disc">
+      <ul className="ml-12 list-disc space-y-2">
         <li>Receiving help through our customer support channels;</li>
         <li>Participation in customer surveys or contests; and </li>
         <li>
@@ -875,7 +880,7 @@ export default function About() {
         We will use and retain the collected personal information as needed to
         provide the Services or for:
       </p>
-      <ul className="list-disc">
+      <ul className="ml-12 list-disc space-y-2">
         <li>Category H - As long as the user has an account with us</li>
       </ul>
       <h3 className="font-semibold">Sources of Personal Information</h3>
@@ -922,7 +927,7 @@ export default function About() {
         these rights are not absolute, and in certain cases, we may decline your
         request as permitted by law. These rights include:
       </p>
-      <ul className="list-disc">
+      <ul className="ml-12 list-disc space-y-2">
         <li>
           <b>Right to know</b> whether or not we are processing your personal
           data
@@ -954,7 +959,7 @@ export default function About() {
         Depending upon the state where you live, you may also have the following
         rights:
       </p>
-      <ul className="list-disc">
+      <ul className="ml-12 list-disc space-y-2">
         <li>
           Right to obtain a list of the categories of third parties to which we
           have disclosed personal data (as permitted by applicable law,
