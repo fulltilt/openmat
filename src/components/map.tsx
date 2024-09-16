@@ -26,6 +26,8 @@ import Modal from "./modal";
 import { useRouter } from "next/navigation";
 import type { Event, CalendarEvent } from "../types";
 
+import { useDebouncedCallback } from "use-debounce";
+
 // Map's styling
 export const defaultMapContainerStyle = {
   width: "75vw",
@@ -42,7 +44,7 @@ const defaultMapOptions = {
 const MapComponent = () => {
   const session = useSession();
   const router = useRouter();
-  console.log(session);
+
   const [currentLocation, setCurrentLocation] = useState({
     lat: 39,
     lng: -95,
@@ -108,10 +110,12 @@ const MapComponent = () => {
       });
   }
 
-  function filterLocations(eventDates: Event[] = []) {
-    const locations = (eventDates.length ? eventDates : calendarEvents)?.map(
-      (e) => e.location,
-    );
+  const filterLocations = useDebouncedCallback((eventDates: Event[] = []) => {
+    const locations =
+      (eventDates.length ? eventDates : calendarEvents)?.map(
+        (e) => e.location,
+      ) ?? [];
+
     let filteredEvents = allOpenMats
       .filter((l) =>
         map
@@ -131,7 +135,7 @@ const MapComponent = () => {
     );
 
     setFilteredCalendarEvents(combinedEventData);
-  }
+  }, 300);
 
   function isThereAnOpenMatThisWeek(openMat: Event) {
     const locations = calendarEvents.map((evt) => evt.location);

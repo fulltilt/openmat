@@ -8,6 +8,7 @@ import {
   DropdownMenuTrigger,
 } from "~/components/ui/dropdown-menu";
 import { auth } from "../api/auth/authConfig";
+import { MapPin } from "lucide-react";
 
 export function Hamburger() {
   return (
@@ -34,11 +35,14 @@ export async function TopNav() {
   return (
     <nav className="sticky top-0 z-50 flex w-full items-center justify-between bg-black p-2 pl-4 pr-4 text-xl font-semibold text-white">
       <div className="flex items-center gap-8">
-        <Link href="/home">OpenMat</Link>
+        <div className="flex">
+          <MapPin className="mr-2 h-6 w-6 text-blue-600" />
+          <Link href="/home">OpenMat</Link>
+        </div>
         <div className="hidden gap-8 sm:flex">
-          <Link href="/about" className="text-sm">
+          {/* <Link href="/about" className="text-sm">
             About
-          </Link>
+          </Link> */}
           <Link
             href="https://www.paypal.com/donate/?hosted_button_id=ZCDZKZW4JE5LG"
             className="text-sm"
@@ -53,11 +57,11 @@ export async function TopNav() {
             <Hamburger />
           </DropdownMenuTrigger>
           <DropdownMenuContent>
-            <DropdownMenuItem>
+            {/* <DropdownMenuItem>
               <Link href="/about" className="text-sm">
                 About
               </Link>
-            </DropdownMenuItem>
+            </DropdownMenuItem> */}
             <DropdownMenuItem>
               <Link
                 href="https://www.paypal.com/donate/?hosted_button_id=ZCDZKZW4JE5LG"
