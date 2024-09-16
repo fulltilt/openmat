@@ -47,7 +47,7 @@ export async function addOpenMat(
   lat: number,
   lng: number,
 ) {
-  await db.insert(openMat).values({ id, name, location, lat, lng });
+  return await db.insert(openMat).values({ id, name, location, lat, lng });
 }
 
 export async function sendEmail(evt) {

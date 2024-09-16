@@ -11,8 +11,8 @@ export default function About() {
       </p>
       <ul className="ml-12 list-disc space-y-2">
         <li>
-          Visit our website at https://openmat-lilac.vercel.app, or any website
-          of ours that links to this Privacy Notice
+          Visit our website at https://open-mat.org, or any website of ours that
+          links to this Privacy Notice
         </li>
         <li>
           Engage with us in other related ways, including any sales, marketing,

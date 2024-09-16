@@ -17,10 +17,12 @@ export default function EventForm({
   setCurrentLocation,
   setZoom,
   setShowForm,
+  updateOpenMats,
 }: {
   setCurrentLocation: ({ lat, lng }: { lat: number; lng: number }) => void;
   setZoom: (zoom: number) => void;
   setShowForm: (show: boolean) => void;
+  updateOpenMats: () => void;
 }) {
   const session = useSession();
   const { toast } = useToast();
@@ -102,18 +104,19 @@ export default function EventForm({
     )
       .then((data) => data.json())
       .then(async (data) => {
-        console.log("data", data);
-
         try {
           const res = await addOpenMat(data.id, name, location, lat, lng);
-          console.log(res);
+          // console.log(res);
+
           toast({
             title: "Success!",
             description: "Open Mat has been submitted!",
             // action: <ToastAction altText="Goto schedule to undo">Undo</ToastAction>,
           });
+
+          updateOpenMats();
         } catch (err) {
-          console.log(err);
+          // console.log(err);
           toast({
             title: "Error!",
             description: "Error adding Open Mat",

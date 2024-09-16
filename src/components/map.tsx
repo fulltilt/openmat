@@ -83,6 +83,21 @@ const MapComponent = () => {
     getUpcomingEvents(date);
   }, [session, date]);
 
+  async function updateOpenMats() {
+    getOpenMats()
+      .then((res) => {
+        setAllOpenMats(res);
+        const currentDate = new Date();
+        const currentDay = currentDate.getDay();
+        const offsetToLastSunday = (currentDay + 7) % 7;
+        const lastSundayDate = new Date(currentDate);
+        lastSundayDate.setDate(currentDate.getDate() - offsetToLastSunday);
+
+        getUpcomingEvents(lastSundayDate);
+      })
+      .catch((err) => console.log(err));
+  }
+
   async function getUpcomingEvents(date: Date) {
     if (!session.data && session.status !== "loading") {
       router.push("/");
@@ -257,6 +272,7 @@ const MapComponent = () => {
                 setCurrentLocation={setCurrentLocation}
                 setZoom={setZoom}
                 setShowForm={setShowForm}
+                updateOpenMats={updateOpenMats}
               />
             </Modal>
           )}
