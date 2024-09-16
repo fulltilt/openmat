@@ -80,39 +80,49 @@ export default function EventForm({
 
     try {
       await sendEmail(Object.assign({}, evt, { verification }));
-      toast({
-        title: "Open Mat Request Sent!",
-        description:
-          "An email has been sent to the admins to verify the open mat. Thanks you for your submission!",
-        // action: <ToastAction altText="Goto schedule to undo">Undo</ToastAction>,
-      });
+      // toast({
+      //   title: "Open Mat Request Sent!",
+      //   description:
+      //     "An email has been sent to the admins to verify the open mat. Thanks you for your submission!",
+      //   // action: <ToastAction altText="Goto schedule to undo">Undo</ToastAction>,
+      // });
     } catch (e) {
       console.log(e);
     }
 
-    // await fetch(
-    //   `https://www.googleapis.com/calendar/v3/calendars/${process.env.NEXT_PUBLIC_GOOGLE_CALENDAR_ID}/events`,
-    //   {
-    //     method: "POST",
-    //     headers: {
-    //       Authorization: `Bearer ${session.data?.access_token}`,
-    //     },
-    //     body: JSON.stringify(evt),
-    //   },
-    // )
-    //   .then((data) => data.json())
-    //   .then(async (data) => {
-    //     console.log("data", data);
+    await fetch(
+      `https://www.googleapis.com/calendar/v3/calendars/${process.env.NEXT_PUBLIC_GOOGLE_CALENDAR_ID}/events`,
+      {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${session.data?.access_token}`,
+        },
+        body: JSON.stringify(evt),
+      },
+    )
+      .then((data) => data.json())
+      .then(async (data) => {
+        console.log("data", data);
 
-    //     try {
-    //       const res = await addOpenMat(data.id, name, location, lat, lng);
-    //       console.log(res);
-    //     } catch (err) {
-    //       console.log(err);
-    //     }
-    //   })
-    //   .catch((err) => console.log("error", err))
-    //   .finally(() => setShowForm(false));
+        try {
+          const res = await addOpenMat(data.id, name, location, lat, lng);
+          console.log(res);
+          toast({
+            title: "Success!",
+            description: "Open Mat has been submitted!",
+            // action: <ToastAction altText="Goto schedule to undo">Undo</ToastAction>,
+          });
+        } catch (err) {
+          console.log(err);
+          toast({
+            title: "Error!",
+            description: "Error adding Open Mat",
+            // action: <ToastAction altText="Goto schedule to undo">Undo</ToastAction>,
+          });
+        }
+      })
+      .catch((err) => console.log("error", err))
+      .finally(() => setShowForm(false));
   }
 
   return (
@@ -193,9 +203,9 @@ export default function EventForm({
       <div>
         <label htmlFor="verification">
           <span className="font-semibold">Verification</span> (before the open
-          mat can be added, we verify to prevent spam. Please provide email,
-          socials, etc. which you can be contacted to verify you aren&apos;t a
-          bot)
+          mat can be added, we verify to prevent spam. Please provide an email
+          (preferably one whose domain matches one on the gym website), socials,
+          etc. which you can be contacted to verify you aren&apos;t a bot)
         </label>
         <Input
           id="verification"

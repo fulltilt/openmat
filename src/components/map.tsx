@@ -141,7 +141,7 @@ const MapComponent = () => {
     const locations = calendarEvents.map((evt) => evt.location);
     return locations.includes(openMat.location);
   }
-  // console.log(filteredCalendarEvents);
+
   return (
     <div className="w-full">
       <div className="flex">
