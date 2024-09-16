@@ -217,8 +217,8 @@ const MapComponent = () => {
                         End:{" "}
                         {`${timeFormat(new Date(currentEvent!.end?.dateTime).toLocaleTimeString())}`}
                       </p>
-                      {(session?.data?.user?.email ?? "") ===
-                        currentEvent.creator.email && <Button>Edit</Button>}
+                      {/* {(session?.data?.user?.email ?? "") ===
+                        currentEvent.creator.email && <Button>Edit</Button>} */}
                     </div>
                   ) : (
                     <div>
