@@ -278,6 +278,8 @@ const MapComponent = () => {
                 <p>{`${timeFormat(new Date(e.start?.dateTime).toLocaleTimeString())} - ${timeFormat(new Date(e.end?.dateTime).toLocaleTimeString())}`}</p>
               </div>
             ))}
+            {filteredCalendarEvents.length === 0 &&
+              "No Open Mats found. Try zooming out."}
           </div>
         </div>
       </div>
