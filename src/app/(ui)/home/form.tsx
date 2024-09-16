@@ -2,7 +2,9 @@
 
 import { useState, FormEvent } from "react";
 import { useSession } from "next-auth/react";
+import { useToast } from "~/hooks/use-toast";
 
+// import { ToastAction } from "~/components/ui/toast";
 import { Button } from "~/components/ui/button";
 import { Checkbox } from "~/components/ui/checkbox";
 import { Input } from "~/components/ui/input";
@@ -21,6 +23,7 @@ export default function EventForm({
   setShowForm: (show: boolean) => void;
 }) {
   const session = useSession();
+  const { toast } = useToast();
 
   const [searchResult, setSearchResult] =
     useState<google.maps.places.Autocomplete>();
@@ -75,7 +78,17 @@ export default function EventForm({
       recurrence: recurring ? ["RRULE:FREQ=WEEKLY;INTERVAL=1"] : undefined,
     };
 
-    sendEmail(Object.assign({}, evt, { verification }));
+    try {
+      await sendEmail(Object.assign({}, evt, { verification }));
+      toast({
+        title: "Open Mat Request Sent!",
+        description:
+          "An email has been sent to the admins to verify the open mat. Thanks you for your submission!",
+        // action: <ToastAction altText="Goto schedule to undo">Undo</ToastAction>,
+      });
+    } catch (e) {
+      console.log(e);
+    }
 
     // await fetch(
     //   `https://www.googleapis.com/calendar/v3/calendars/${process.env.NEXT_PUBLIC_GOOGLE_CALENDAR_ID}/events`,
@@ -105,12 +118,16 @@ export default function EventForm({
   return (
     <form onSubmit={onSubmit} className="flex flex-col gap-8 p-4 text-sm">
       <div>
-        <label htmlFor="name">Event Name</label>
-        <Input id="name" name="name" />
+        <label htmlFor="name" className="font-semibold">
+          Event Name
+        </label>
+        <Input id="name" name="name" className="mt-2" required />
       </div>
 
       <div>
-        <label htmlFor="location">Location</label>
+        <label htmlFor="location" className="font-semibold">
+          Location
+        </label>
         <Autocomplete
           onLoad={onLoad}
           onPlaceChanged={handleOnPlaceChanged}
@@ -118,15 +135,18 @@ export default function EventForm({
         >
           <Input
             placeholder="Enter your location"
-            className="z-50"
+            className="z-50 mt-2"
             id="location"
             name="location"
+            required
           />
         </Autocomplete>
       </div>
 
       <div>
-        <label htmlFor="startDate">Start Time</label>
+        <label htmlFor="startDate" className="font-semibold">
+          Start Time
+        </label>
         <br />
         <input
           aria-label="Date and time"
@@ -146,7 +166,9 @@ export default function EventForm({
       </div>
 
       <div>
-        <label htmlFor="endDate">End Time</label>
+        <label htmlFor="endDate" className="font-semibold">
+          End Time
+        </label>
         <br />
         <input
           aria-label="Date and time"
@@ -170,10 +192,17 @@ export default function EventForm({
 
       <div>
         <label htmlFor="verification">
-          Verification method (provide email, socials, etc. which you can be
-          contacted at)
+          <span className="font-semibold">Verification</span> (before the open
+          mat can be added, we verify to prevent spam. Please provide email,
+          socials, etc. which you can be contacted to verify you aren&apos;t a
+          bot)
         </label>
-        <Input id="verification" name="verification" />
+        <Input
+          id="verification"
+          name="verification"
+          className="mt-2"
+          required
+        />
       </div>
       <Button type="submit">Submit</Button>
     </form>

@@ -34,7 +34,7 @@ TODO
 [x] show locations of OpenMats within the next week
 [] let user edit Open Mat once they're verified
 [x] Send email when a new open mat is created
-[] Setup Google Analytics
+[x] Setup Google Analytics
 
 https://devrecipes.net/modal-component-with-next-js-part-2/
 https://web.archive.org/web/20230701010714mp_/https://react-google-maps-api-docs.netlify.app/
