@@ -26,8 +26,8 @@ export default function About() {
         information is processed. If you do not agree with our policies and
         practices, please do not use our Services. If you still have any
         questions or concerns, please contact us at{" "}
-        <a href="mailto:support@openmat.cc" className="text-blue-700">
-          support@openmat.cc
+        <a href="mailto:support@open-mat.org" className="text-blue-700">
+          support@open-mat.org
         </a>
         .
       </p>
@@ -609,8 +609,8 @@ export default function About() {
         to promptly delete such data from our records. If you become aware of
         any data we may have collected from children under age 18, please
         contact us at{" "}
-        <a href="mailto:support@openmat.cc" className="text-blue-700">
-          support@openmat.cc
+        <a href="mailto:support@open-mat.org" className="text-blue-700">
+          support@open-mat.org
         </a>
         .
       </p>
@@ -716,8 +716,8 @@ export default function About() {
       <p>
         If you have questions or comments about your privacy rights, you may
         email us at{" "}
-        <a href="mailto:support@openmat.cc" className="text-blue-700">
-          support@openmat.cc
+        <a href="mailto:support@open-mat.org" className="text-blue-700">
+          support@open-mat.org
         </a>
         .
       </p>
@@ -985,8 +985,8 @@ export default function About() {
       <p>
         To exercise these rights, you can contact us by submitting a data
         subject access request, by emailing us at{" "}
-        <a href="mailto:support@openmat.cc" className="text-blue-700">
-          support@openmat.cc
+        <a href="mailto:support@open-mat.org" className="text-blue-700">
+          support@open-mat.org
         </a>
         , or by referring to the contact details at the bottom of this document.
       </p>
@@ -1019,8 +1019,8 @@ export default function About() {
         Under certain US state data protection laws, if we decline to take
         action regarding your request, you may appeal our decision by emailing
         us at{" "}
-        <a href="mailto:support@openmat.cc" className="text-blue-700">
-          support@openmat.cc
+        <a href="mailto:support@open-mat.org" className="text-blue-700">
+          support@open-mat.org
         </a>
         . We will inform you in writing of any action taken or not taken in
         response to the appeal, including a written explanation of the reasons
@@ -1065,8 +1065,8 @@ export default function About() {
       </h2>
       <p>
         If you have questions or comments about this notice, you may email us at{" "}
-        <a href="mailto:support@openmat.cc" className="text-blue-700">
-          support@openmat.cc
+        <a href="mailto:support@open-mat.org" className="text-blue-700">
+          support@open-mat.org
         </a>
         .
       </p>
@@ -1083,8 +1083,8 @@ export default function About() {
         by applicable law. To request to review, update, or delete your personal
         information, please fill out and submit a data subject access request or
         email us at{" "}
-        <a href="mailto:support@openmat.cc" className="text-blue-700">
-          support@openmat.cc
+        <a href="mailto:support@open-mat.org" className="text-blue-700">
+          support@open-mat.org
         </a>
         .
       </p>

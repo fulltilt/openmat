@@ -45,7 +45,7 @@ const Modal = ({
     >
       {/* Wrap the whole Modal inside the newly created StyledModalWrapper
             and use the ref */}
-      <div ref={modalWrapperRef} className="h-[600px] w-[500px]">
+      <div ref={modalWrapperRef} className="h-[650px] w-[550px]">
         <div className="h-full w-full rounded-[15px] bg-white p-4">
           <div className="flex justify-end text-xl">
             <a href="#" onClick={handleCloseClick}>

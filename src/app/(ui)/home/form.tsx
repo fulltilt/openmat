@@ -9,7 +9,7 @@ import { Input } from "~/components/ui/input";
 
 import { Autocomplete } from "@react-google-maps/api";
 import { toLocalISOString } from "~/lib/utils";
-import { addOpenMat } from "~/server/queries";
+import { addOpenMat, sendEmail } from "~/server/queries";
 
 export default function EventForm({
   setCurrentLocation,
@@ -59,6 +59,7 @@ export default function EventForm({
     const recurring = formData.get("recurrence");
     const startDate = new Date(formData.get("startDate") as string);
     const endDate = new Date(formData.get("endDate") as string);
+    const verification = formData.get("verification");
 
     const evt = {
       summary: name,
@@ -74,33 +75,35 @@ export default function EventForm({
       recurrence: recurring ? ["RRULE:FREQ=WEEKLY;INTERVAL=1"] : undefined,
     };
 
-    await fetch(
-      `https://www.googleapis.com/calendar/v3/calendars/${process.env.NEXT_PUBLIC_GOOGLE_CALENDAR_ID}/events`,
-      {
-        method: "POST",
-        headers: {
-          Authorization: `Bearer ${session.data?.access_token}`,
-        },
-        body: JSON.stringify(evt),
-      },
-    )
-      .then((data) => data.json())
-      .then(async (data) => {
-        console.log("data", data);
+    sendEmail(Object.assign({}, evt, { verification }));
 
-        try {
-          const res = await addOpenMat(data.id, name, location, lat, lng);
-          console.log(res);
-        } catch (err) {
-          console.log(err);
-        }
-      })
-      .catch((err) => console.log("error", err))
-      .finally(() => setShowForm(false));
+    // await fetch(
+    //   `https://www.googleapis.com/calendar/v3/calendars/${process.env.NEXT_PUBLIC_GOOGLE_CALENDAR_ID}/events`,
+    //   {
+    //     method: "POST",
+    //     headers: {
+    //       Authorization: `Bearer ${session.data?.access_token}`,
+    //     },
+    //     body: JSON.stringify(evt),
+    //   },
+    // )
+    //   .then((data) => data.json())
+    //   .then(async (data) => {
+    //     console.log("data", data);
+
+    //     try {
+    //       const res = await addOpenMat(data.id, name, location, lat, lng);
+    //       console.log(res);
+    //     } catch (err) {
+    //       console.log(err);
+    //     }
+    //   })
+    //   .catch((err) => console.log("error", err))
+    //   .finally(() => setShowForm(false));
   }
 
   return (
-    <form onSubmit={onSubmit} className="flex flex-col gap-8 text-sm">
+    <form onSubmit={onSubmit} className="flex flex-col gap-8 p-4 text-sm">
       <div>
         <label htmlFor="name">Event Name</label>
         <Input id="name" name="name" />
@@ -166,8 +169,11 @@ export default function EventForm({
       </div>
 
       <div>
-        <label htmlFor="website">Website (for verification purposes)</label>
-        <Input id="website" name="website" />
+        <label htmlFor="verification">
+          Verification method (provide email, socials, etc. which you can be
+          contacted at)
+        </label>
+        <Input id="verification" name="verification" />
       </div>
       <Button type="submit">Submit</Button>
     </form>

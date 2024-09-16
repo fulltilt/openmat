@@ -33,7 +33,7 @@ TODO
 [x] let user create an OpenMat Event with a Location
 [x] show locations of OpenMats within the next week
 [] let user edit Open Mat once they're verified
-[] Send email when a new open mat is created
+[x] Send email when a new open mat is created
 [] Setup Google Analytics
 
 https://devrecipes.net/modal-component-with-next-js-part-2/

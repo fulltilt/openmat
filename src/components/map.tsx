@@ -105,7 +105,7 @@ const MapComponent = () => {
         return data.items;
       })
       .catch((err) => {
-        console.log("error", err);
+        // console.log("error", err);
         return err;
       });
   }
