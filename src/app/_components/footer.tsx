@@ -14,7 +14,7 @@ export function Footer() {
               Terms of Service
             </Link> */}
           <Link
-            className="text-sm text-gray-600 transition-colors hover:text-blue-600"
+            className="text-sm text-white transition-colors hover:text-blue-600"
             href="privacy"
           >
             Privacy Policy

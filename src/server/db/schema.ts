@@ -109,6 +109,9 @@ export const openMat = createTable("open_mat", {
   location: varchar("location").notNull(),
   lat: decimal("lat").notNull(),
   lng: decimal("lng").notNull(),
+  createdAt: timestamp("created_at", { withTimezone: true })
+    .default(sql`CURRENT_TIMESTAMP`)
+    .notNull(),
 });
 
 export const openMatAdmin = createTable("open_mat_admin", {
@@ -119,4 +122,7 @@ export const openMatAdmin = createTable("open_mat_admin", {
   user_id: varchar("user_id")
     .notNull()
     .references(() => user.id),
+  createdAt: timestamp("created_at", { withTimezone: true })
+    .default(sql`CURRENT_TIMESTAMP`)
+    .notNull(),
 });
