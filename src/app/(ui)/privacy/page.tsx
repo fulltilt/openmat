@@ -1,6 +1,6 @@
 export default function About() {
   return (
-    <div className="m-auto mb-20 mt-12 flex w-[80%] flex-col gap-4">
+    <div className="m-auto mb-20 mt-12 flex w-[74ch] flex-col gap-4">
       <p className="m-auto text-2xl font-bold">PRIVACY POLICY</p>
       <p className="m-auto font-semibold">Last updated September 13, 2024</p>
       <p>
